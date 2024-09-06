@@ -6,13 +6,21 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+
+    "lint:check": "eslint -c .eslintrc.cjs ./src",
+    "lint:fix": "prettier -w ./src",
+
+    "test": "vitest"
   },
   "dependencies": {
     "@testing-library/vue": "^8.1.0",
     "axios": "^1.7.7",
     "debounce": "^2.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
     "happy-dom": "^15.7.3",
+    "prettier": "^3.3.3",
     "vee-validate": "^4.13.2",
     "vitest": "^2.0.5",
     "vue": "^3.4.37",
