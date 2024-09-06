@@ -12,7 +12,8 @@
     "axios": "^1.7.7",
     "debounce": "^2.1.0",
     "vee-validate": "^4.13.2",
-    "vue": "^3.4.37"
+    "vue": "^3.4.37",
+    "vue-i18n": "^9.14.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.2",

@@ -1,13 +1,5 @@
-<script setup lang="ts">
-import { ref } from 'vue'
-
-defineProps<{ msg: string }>()
-
-const count = ref(0)
-</script>
-
 <template>
-  <h1>{{ msg }}</h1>
+  <h1>{{ t('hello') }}</h1>
 
   <div class="card">
     <button type="button" @click="count++">count is {{ count }}</button>
@@ -33,6 +25,15 @@ const count = ref(0)
   </p>
   <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import {useI18n} from 'vue-i18n'
+
+const { t } = useI18n({useScope: 'global'})
+
+const count = ref(0)
+</script>
 
 <style scoped>
 .read-the-docs {
