@@ -4,7 +4,7 @@ import App from './App.vue'
 
 // I18n
 import { createI18n } from 'vue-i18n'
-import { languages } from './i18n'
+import { messages } from './i18n'
 
 // Vuetify
 import 'vuetify/styles'
@@ -17,7 +17,7 @@ const i18n = createI18n({
     locale: 'ru',
     fallbackLocale: 'en',
     messages: {
-        ...languages
+        ...messages
     }
 })
 

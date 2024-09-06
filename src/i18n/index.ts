@@ -1,7 +1,9 @@
 import en from './en.json'
 import ru from './ru.json'
 
-export const languages: Record<string, any> = {
+type MessageSchema = typeof en;
+
+export const messages: Record<string, MessageSchema> = {
     en,
     ru
 }
