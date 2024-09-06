@@ -1,31 +1,29 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue';
+import CurrencyConvertor from './components/CurrencyConvertor.vue';
 </script>
 
 <template>
-    <div>
-        <a
-            href="https://vitejs.dev"
-            target="_blank"
+    <VLayout ref="app">
+        <VAppBar
+            title="CurCon"
+            density="compact"
+            flat
+            color="grey-lighten-3"
         >
-            <img
-                src="/vite.svg"
-                class="logo"
-                alt="Vite logo"
-            />
-        </a>
-        <a
-            href="https://vuejs.org/"
-            target="_blank"
+            <VSwitch> </VSwitch>
+        </VAppBar>
+
+        <VMain>
+            <CurrencyConvertor />
+        </VMain>
+
+        <VFooter
+            app
+            color="grey-lighten-2"
         >
-            <img
-                src="./assets/vue.svg"
-                class="logo vue"
-                alt="Vue logo"
-            />
-        </a>
-    </div>
-    <HelloWorld />
+            BipBop
+        </VFooter>
+    </VLayout>
 </template>
 
 <style scoped>
