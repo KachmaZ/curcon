@@ -9,11 +9,11 @@
                 class="d-flex"
             >
                 <VTextField
-                    v-model="initialValue"
+                    v-model="baseValue"
                     type="number"
                 />
                 <VSelect
-                    v-model="initialCurrency"
+                    v-model="baseCurrency"
                     :items="currencies"
                 />
             </VCol>
@@ -48,32 +48,35 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue';
+import {onMounted, ref} from 'vue';
+import { getCurrencyExchangeRate } from '../api';
 
-const initialValue = ref(0);
+const baseValue = ref(0);
 const resultValue = ref(0);
 
-const initialCurrency = ref('RUB');
+const baseCurrency = ref('RUB');
 const resultCurrency = ref('USD');
 
 const currencies = [
-    {
-        title: `RUB`,
-        value: 'RUB',
-    },
-    {
-        title: `USD`,
-        value: 'USD',
-    },
-    {
-        title: `EUR`,
-        value: 'EUR',
-    },
-    {
-        title: `CNY`,
-        value: 'CNY',
-    },
+    'RUB',
+    'USD',
+    'EUR',
+    'CNY',
 ];
+
+const exchangeRates = ref();
+
+const setExchangeRates = async () => {
+    const response = await getCurrencyExchangeRate(baseCurrency.value, currencies);
+    
+    if (response?.status === 200) {
+        exchangeRates.value = response.data.data
+    }
+} 
+
+onMounted(async () => {
+    await setExchangeRates();    
+})
 </script>
 
 <style scoped></style>
