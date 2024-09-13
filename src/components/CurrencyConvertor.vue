@@ -23,7 +23,10 @@
                 cols="2"
                 class="d-flex align-center justify-center"
             >
-                <VBtn flat @click="swapCurrentCurrencies">
+                <VBtn
+                    flat
+                    @click="swapCurrentCurrencies"
+                >
                     <VIcon
                         icon="mdi-swap-horizontal"
                         size="large"
@@ -51,84 +54,76 @@
 
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue';
-import { getCurrencyExchangeRate } from '../api';
+import {getCurrencyExchangeRate} from '../api';
 
 const baseValue = ref(0);
 const roundedBaseValue = computed({
     get: () => {
-        return baseValue.value
+        return baseValue.value;
     },
-    set: (val: number) => val > 0 ? baseValue.value = val : baseValue.value = 0
-})
+    set: (val: number) =>
+        val > 0 ? (baseValue.value = val) : (baseValue.value = 0),
+});
 const targetValue = ref(0);
 
 const baseCurrency = ref<TCurrency>('USD');
 const roundedTargetValue = computed({
     get: () => {
-        return targetValue.value
+        return targetValue.value;
     },
-    set: (val: number) => val > 0 ? targetValue.value = val : targetValue.value = 0
-})
+    set: (val: number) =>
+        val > 0 ? (targetValue.value = val) : (targetValue.value = 0),
+});
 const targetCurrency = ref<TCurrency>('RUB');
 
-const currencies = [
-    'RUB',
-    'USD',
-    'EUR',
-    'CNY',
-];
+const currencies = ['RUB', 'USD', 'EUR', 'CNY'];
 
-type TCurrency = "RUB" | "USD" | "EUR" | "CNY"
+type TCurrency = 'RUB' | 'USD' | 'EUR' | 'CNY';
 
 type APIResponse = {
     [currency in TCurrency]: {
-        "code": TCurrency,
-        "value": number
-    }
-}
+        code: TCurrency;
+        value: number;
+    };
+};
 
-const exchangeRates = ref<APIResponse>({
-    "CNY": {
-        "code": "CNY",
-        "value": 1.3570001415
-    },
-    "EUR": {
-        "code": "EUR",
-        "value": 0.9019401718
-    },
-    "USD": {
-        "code": "USD",
-        "value": 1
-    },
-    "RUB": {
-        "code": "RUB",
-        "value": 80
-    }
-});
+const exchangeRates = ref<APIResponse>(<APIResponse>{});
 
 const swapCurrentCurrencies = () => {
-    [baseCurrency.value, targetCurrency.value] = [targetCurrency.value, baseCurrency.value] 
-}
+    [baseCurrency.value, targetCurrency.value] = [
+        targetCurrency.value,
+        baseCurrency.value,
+    ];
+};
 
 const setExchangeRates = async () => {
-    const response = await getCurrencyExchangeRate(baseCurrency.value, currencies);
-    
-    if (response?.status === 200) {
-        exchangeRates.value = response.data.data
-    }
-} 
+    const response = await getCurrencyExchangeRate(
+        baseCurrency.value,
+        currencies
+    );
 
-const onBaseInput = () => {    
-    targetValue.value = baseValue.value * exchangeRates.value[targetCurrency.value].value
-}
+    if (response?.status === 200) {
+        exchangeRates.value = response.data.data;
+    }
+};
+
+const onBaseInput = () => {
+    targetValue.value =
+        baseValue.value * exchangeRates.value[targetCurrency.value].value;
+};
 
 const onTargetInput = () => {
-    baseValue.value = targetValue.value / exchangeRates.value[targetCurrency.value].value
-}
+    baseValue.value =
+        targetValue.value / exchangeRates.value[targetCurrency.value].value;
+};
 
-watch(baseCurrency, () => {
-    setExchangeRates();
-}, { immediate: true })
+watch(
+    baseCurrency,
+    () => {
+        setExchangeRates();
+    },
+    {immediate: true}
+);
 </script>
 
 <style scoped></style>
