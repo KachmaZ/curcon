@@ -9,7 +9,7 @@
                 class="d-flex"
             >
                 <VTextField
-                    v-model.number="roundedBaseValue"
+                    v-model.number="baseValue"
                     type="number"
                     @input="onBaseInput"
                 />
@@ -39,7 +39,7 @@
                 class="d-flex"
             >
                 <VTextField
-                    v-model.number="roundedTargetValue"
+                    v-model.number="targetValue"
                     type="number"
                     @input="onTargetInput"
                 />
@@ -53,27 +53,13 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
+import {ref, watch} from 'vue';
 import {getCurrencyExchangeRate} from '../api';
 
 const baseValue = ref(0);
-const roundedBaseValue = computed({
-    get: () => {
-        return baseValue.value;
-    },
-    set: (val: number) =>
-        val > 0 ? (baseValue.value = val) : (baseValue.value = 0),
-});
 const targetValue = ref(0);
 
 const baseCurrency = ref<TCurrency>('USD');
-const roundedTargetValue = computed({
-    get: () => {
-        return targetValue.value;
-    },
-    set: (val: number) =>
-        val > 0 ? (targetValue.value = val) : (targetValue.value = 0),
-});
 const targetCurrency = ref<TCurrency>('RUB');
 
 const currencies = ['RUB', 'USD', 'EUR', 'CNY'];
@@ -119,8 +105,9 @@ const onTargetInput = () => {
 
 watch(
     baseCurrency,
-    () => {
-        setExchangeRates();
+    async () => {
+        await setExchangeRates();
+        onBaseInput();
     },
     {immediate: true}
 );
