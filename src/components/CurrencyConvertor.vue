@@ -9,9 +9,9 @@
                 class="d-flex"
             >
                 <VTextField
-                    v-model.number="roundedBaseValue"
+                    v-model.number="baseValue"
                     type="number"
-                    @input="onBaseInput"
+                    @input="calculateTarget"
                 />
                 <VSelect
                     v-model="baseCurrency"
@@ -39,13 +39,14 @@
                 class="d-flex"
             >
                 <VTextField
-                    v-model.number="roundedTargetValue"
+                    v-model.number="targetValue"
                     type="number"
-                    @input="onTargetInput"
+                    @input="calculateBase"
                 />
                 <VSelect
                     v-model="targetCurrency"
                     :items="currencies"
+                    @update:model-value="calculateTarget"
                 />
             </VCol>
         </VRow>
@@ -53,27 +54,13 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue';
+import {ref, watch} from 'vue';
 import {getCurrencyExchangeRate} from '../api';
 
 const baseValue = ref(0);
-const roundedBaseValue = computed({
-    get: () => {
-        return baseValue.value;
-    },
-    set: (val: number) =>
-        val > 0 ? (baseValue.value = val) : (baseValue.value = 0),
-});
 const targetValue = ref(0);
 
 const baseCurrency = ref<TCurrency>('USD');
-const roundedTargetValue = computed({
-    get: () => {
-        return targetValue.value;
-    },
-    set: (val: number) =>
-        val > 0 ? (targetValue.value = val) : (targetValue.value = 0),
-});
 const targetCurrency = ref<TCurrency>('RUB');
 
 const currencies = ['RUB', 'USD', 'EUR', 'CNY'];
@@ -107,20 +94,21 @@ const setExchangeRates = async () => {
     }
 };
 
-const onBaseInput = () => {
+const calculateTarget = () => {
     targetValue.value =
         baseValue.value * exchangeRates.value[targetCurrency.value].value;
 };
 
-const onTargetInput = () => {
+const calculateBase = () => {
     baseValue.value =
         targetValue.value / exchangeRates.value[targetCurrency.value].value;
 };
 
 watch(
     baseCurrency,
-    () => {
-        setExchangeRates();
+    async () => {
+        await setExchangeRates();
+        calculateTarget();
     },
     {immediate: true}
 );
