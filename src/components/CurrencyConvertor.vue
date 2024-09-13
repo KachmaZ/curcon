@@ -9,8 +9,9 @@
                 class="d-flex"
             >
                 <VTextField
-                    v-model="baseValue"
+                    v-model.number="roundedBaseValue"
                     type="number"
+                    @input="onBaseInput"
                 />
                 <VSelect
                     v-model="baseCurrency"
@@ -22,7 +23,10 @@
                 cols="2"
                 class="d-flex align-center justify-center"
             >
-                <VBtn flat>
+                <VBtn
+                    flat
+                    @click="swapCurrentCurrencies"
+                >
                     <VIcon
                         icon="mdi-swap-horizontal"
                         size="large"
@@ -35,11 +39,12 @@
                 class="d-flex"
             >
                 <VTextField
-                    v-model="resultValue"
+                    v-model.number="roundedTargetValue"
                     type="number"
+                    @input="onTargetInput"
                 />
                 <VSelect
-                    v-model="resultCurrency"
+                    v-model="targetCurrency"
                     :items="currencies"
                 />
             </VCol>
@@ -48,35 +53,77 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
-import { getCurrencyExchangeRate } from '../api';
+import {computed, ref, watch} from 'vue';
+import {getCurrencyExchangeRate} from '../api';
 
 const baseValue = ref(0);
-const resultValue = ref(0);
+const roundedBaseValue = computed({
+    get: () => {
+        return baseValue.value;
+    },
+    set: (val: number) =>
+        val > 0 ? (baseValue.value = val) : (baseValue.value = 0),
+});
+const targetValue = ref(0);
 
-const baseCurrency = ref('RUB');
-const resultCurrency = ref('USD');
+const baseCurrency = ref<TCurrency>('USD');
+const roundedTargetValue = computed({
+    get: () => {
+        return targetValue.value;
+    },
+    set: (val: number) =>
+        val > 0 ? (targetValue.value = val) : (targetValue.value = 0),
+});
+const targetCurrency = ref<TCurrency>('RUB');
 
-const currencies = [
-    'RUB',
-    'USD',
-    'EUR',
-    'CNY',
-];
+const currencies = ['RUB', 'USD', 'EUR', 'CNY'];
 
-const exchangeRates = ref();
+type TCurrency = 'RUB' | 'USD' | 'EUR' | 'CNY';
+
+type APIResponse = {
+    [currency in TCurrency]: {
+        code: TCurrency;
+        value: number;
+    };
+};
+
+const exchangeRates = ref<APIResponse>(<APIResponse>{});
+
+const swapCurrentCurrencies = () => {
+    [baseCurrency.value, targetCurrency.value] = [
+        targetCurrency.value,
+        baseCurrency.value,
+    ];
+};
 
 const setExchangeRates = async () => {
-    const response = await getCurrencyExchangeRate(baseCurrency.value, currencies);
-    
-    if (response?.status === 200) {
-        exchangeRates.value = response.data.data
-    }
-} 
+    const response = await getCurrencyExchangeRate(
+        baseCurrency.value,
+        currencies
+    );
 
-onMounted(async () => {
-    await setExchangeRates();    
-})
+    if (response?.status === 200) {
+        exchangeRates.value = response.data.data;
+    }
+};
+
+const onBaseInput = () => {
+    targetValue.value =
+        baseValue.value * exchangeRates.value[targetCurrency.value].value;
+};
+
+const onTargetInput = () => {
+    baseValue.value =
+        targetValue.value / exchangeRates.value[targetCurrency.value].value;
+};
+
+watch(
+    baseCurrency,
+    () => {
+        setExchangeRates();
+    },
+    {immediate: true}
+);
 </script>
 
 <style scoped></style>
