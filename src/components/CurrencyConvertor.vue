@@ -11,7 +11,7 @@
                 <VTextField
                     v-model.number="baseValue"
                     type="number"
-                    @input="onBaseInput"
+                    @input="calculateTarget"
                 />
                 <VSelect
                     v-model="baseCurrency"
@@ -41,11 +41,12 @@
                 <VTextField
                     v-model.number="targetValue"
                     type="number"
-                    @input="onTargetInput"
+                    @input="calculateBase"
                 />
                 <VSelect
                     v-model="targetCurrency"
                     :items="currencies"
+                    @update:model-value="calculateTarget"
                 />
             </VCol>
         </VRow>
@@ -93,12 +94,12 @@ const setExchangeRates = async () => {
     }
 };
 
-const onBaseInput = () => {
+const calculateTarget = () => {
     targetValue.value =
         baseValue.value * exchangeRates.value[targetCurrency.value].value;
 };
 
-const onTargetInput = () => {
+const calculateBase = () => {
     baseValue.value =
         targetValue.value / exchangeRates.value[targetCurrency.value].value;
 };
@@ -107,7 +108,7 @@ watch(
     baseCurrency,
     async () => {
         await setExchangeRates();
-        onBaseInput();
+        calculateTarget();
     },
     {immediate: true}
 );
